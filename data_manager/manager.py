@@ -22,7 +22,11 @@ def create_empty_data_structure():
 
 
 def load_data():
-    """Load data from a JSON file for today's date if it exists."""
+    """
+    Load data from a JSON file for today's date if it exists, otherwise create
+    a new one.
+
+    """
     if data_path.exists():
         try:
             with data_path.open('r') as file:

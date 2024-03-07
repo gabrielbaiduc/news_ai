@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def scrape_links(section, source):
     """
-    Scrape links from a given section of a source.
+    Scrape links from a section of a source.
     
     Parameters:
         section (str): The url of the section
