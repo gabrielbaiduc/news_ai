@@ -9,13 +9,11 @@ from config.settings import user_agents
 
 logger = logging.getLogger(__name__)
 
+session = requests.Session()
 
 def get_random_user_agent():
     """Returns a random user agent string from the predefined list."""
     return random.choice(user_agents)
-
-
-session = requests.Session()
 
 
 def fetch(url):
@@ -168,4 +166,5 @@ def tolerance_limit_reached(data, link, links, index, tolerance):
     data["outdated_links"].append(link)
     logging.warning(f"OOD: {tolerance} after {link}\n")
     return False
+
 

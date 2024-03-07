@@ -21,12 +21,14 @@ def create_empty_data_structure():
     return data
 
 
-def load_data():
+def load_data(f_name = None):
     """
     Load data from a JSON file for today's date if it exists, otherwise create
     a new one.
 
     """
+    if filename is not None:
+        data_path = base_dir / "data" / filename
     if data_path.exists():
         try:
             with data_path.open('r') as file:
