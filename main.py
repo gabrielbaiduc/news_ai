@@ -1,8 +1,9 @@
 import logging
 import logging.config
 
-from scraping.main_scraper import scrape
-from data_manager.manager import load_data, save_data
+from scraping.scrape import scrape
+from data_manager.manager import load_data, save_data, merge_data
+
 
 def setup_logging():
     """
@@ -34,8 +35,10 @@ def setup_logging():
     })         
 
 
+
 if __name__ == '__main__':
     setup_logging()
-    data = load_data()
-    scrape(data)
-    save_data(data)
+    articles = load_data()
+    new_articles = scrape(articles)
+    merged_data = merge_data(articles, new_articles)
+    save_data(merged_data)

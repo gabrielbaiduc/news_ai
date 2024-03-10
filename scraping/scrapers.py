@@ -3,82 +3,99 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-from .scraper_utilities import fetch, parse, get_date
-from config.settings import selector_configs, today
+from config.settings import selector_configs, section_configs
+from utils.web_operations import fetch, parse
+from scraping.scraper_utilities import selector_error, parse_datetime
+from utils.helpers import word_count
 
 logger = logging.getLogger(__name__)
 
 
-def scrape_links(section, source):
-    """
-    Scrape links from a section of a source.
-    
-    Parameters:
-        section (str): The url of the section
-        source (str): The source news site
-    
-    Returns:
-        list: A list of scraped links.
-    """
-    content = fetch(section)
-    parsed_content = parse(content)
-    selectors = selector_configs[source].values()
-    link_selector, link_prefix, _, _, _ = selectors
-    link_elements = parsed_content.select(link_selector)
-    links = [urljoin(link_prefix, link["href"]) for link in link_elements]
-    logger.info(f"Scraped {len(links)} links from {section}\n")
-    return links
+def scrape_urls_from_sections(sources, data):
+    section_urls = []
+    for source in sources:
+        for section_url, category in section_configs[source]:
+            # Network
+            response = fetch(section_url)
+            if not response:
+                continue
+            soup = parse(response)
+
+            # Selector
+            selectors = selector_configs[source].values()
+            selector, prefix, _ = selectors
+            elements = soup.select(selector)
+            if selector_error(selector, elements, section_url):
+                continue
+
+            # Scrape & validate
+            hrefs = [element["href"] for element in elements]
+            if source == "nyt": # EXTRA: nyt only to filter out non-text URLs.
+                hrefs = [
+                href for href in hrefs 
+                if not href.startswith("/interactive") 
+                and not href.startswith("/video")
+                ]
+            urls = [urljoin(prefix, href) for href in hrefs]
+            if data:
+                urls = [url for url in urls if url not in data]
+            logger.info(f"Scraped {len(urls)} URLs from {section_url}")
+            section_urls.append((urls, category, source))
+    return section_urls
 
 
-def scrape_contents(link, source, category):
-    """
-    Scrape article content from a given link.
-    
-    Parameters:
-        link (str): The link to the article.
-        source (str): The source news site.
-        category (str): The category of the article.
-        selector_configs (dict): A dictionary of CSS selector configurations.
-    
-    Returns:
-        dict: A dictionary containing the article's title, text content, 
-              publication date, link, source, category, and word count.
-    """
-    content = fetch(link)
-    parsed_content = parse(content)
-    selectors = selector_configs[source].values()
-    _, _, title_selector, text_selector, date_selector = selectors
+def scrape_header(url):
+    # Network
+    response = fetch(url)
+    if not response:
+        return None
+    soup = parse(response)
 
-    # Validate and scrape date
-    date_element = parsed_content.select_one(date_selector)
-    if date_element is None:
-        return "date selector error"
-    publication_date = get_date(date_element)
-    if publication_date != today:
-        return "out of date"
+    # Selector
+    selector = selector_configs["ld_json"]
+    element = soup.select_one(selector)
+    if selector_error(selector, element, url):
+        return None
 
-    # Validate and scrape title
-    title_element = parsed_content.select_one(title_selector)
-    if title_element is None:
-        return "title selector error"
-    title = title_element.text.strip()
+    # Scrape & validate
+    string = element.get_text()
+    ld_json = json.loads(string)
+    if isinstance(ld_json, list):
+        ld_json = ld_json[0]
+    if not isinstance(ld_json, dict):
+        logger.error(f"Unexpected header format {url}")
+        return None
+    try:
+        published = ld_json["datePublished"]
+        modified = ld_json["dateModified"]
+        headline = ld_json["headline"]
+        description = ld_json["description"]
+    except KeyError as err:
+        logger.error(f"Missing key: {err}")
+        return None
+    published = parse_datetime(published)
+    modified = parse_datetime(modified)
+    return published, modified, headline, description
 
-    # Validate and scrape text content
-    paragraph_elements = parsed_content.select(text_selector)
-    if paragraph_elements is None:
-        return "text selector error"
-    paragraphs = [p.text.strip() for p in paragraph_elements]
+
+def scrape_text(url, source):
+    # Network
+    response = fetch(url)
+    if not response:
+        return None
+    soup = parse(response)
+
+    # Selector
+    selector = selector_configs[source]["text_selector"]
+    elements = soup.select(selector)
+    if selector_error(selector, elements, url):
+        return None
+
+    # Srape & validate
+    ps = [element.text.strip() for element in elements]
+    paragraphs = [p for p in ps if word_count(p) > 0]
     text_content = ''.join(paragraphs)
-
-    # Get the word count of the text content
-    word_count = len(text_content.split())
-
-    return {
-        "title": title,
-        "text": text_content,
-        "date": publication_date,
-        "link": link,
-        "source": source,
-        "category": category,
-        "word_count": word_count
-    }
+    if word_count(text_content) < 100:
+        logger.info(f"Body too short {url}")
+        return None
+    return text_content
