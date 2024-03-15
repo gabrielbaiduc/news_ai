@@ -1,15 +1,19 @@
-from config.settings import summary_model
 from utils.web_operations import post
+from utils.helpers import isinwindow, word_count
+from data_manager.manager import *
+from config.settings import *
+import math
 
+logger = logging.getLogger(__name__)
 
-def compose_prompt(text, word_count):
-	if word_count < 200:
-		system_prompt = "appropriate system prompt"
-	elif word_count < 500:
-		system_prompt = "appropriate system prompt"
-	else:
-		system_prompt = "appropriate system prompt"
-	max_tokens = 1.3*(word_count)*0.3
+def calculatesummarylength(x):
+	return round(40 + 65.24*math.log(0.01*x))
+
+def compose_prompt(body, body_count):
+	system_prompt = (
+	    f"You will be given an article. Your task is to summarise it in "
+	    f"'{calculatesummarylength(body_count)} words'."
+	)
 
 	data = {
 	  "model": summary_model,
@@ -18,30 +22,41 @@ def compose_prompt(text, word_count):
 	      "content": system_prompt
 	  }, {
 	      "role": "user",
-	      "content": text
+	      "content": body
 	  }],
-	  "temperature": 1,
-	  "max_tokens": max_tokens,
+	  "temperature": 0.5,
+	  "max_tokens": 1000,
 	  "top_p": 1.0,
 	  "frequency_penalty": 0.0,
 	  "presence_penalty": 0.0
 	}
+	return data
 
 
-def process_response(response, articles):
+def process_response(response, url, articles):
 	response_dict = response.json()
 	summary = response_dict["choices"][0]["message"]["content"]
 	tokens_sent = response_dict["usage"]["prompt_tokens"]
 	tokens_received = response_dict["usage"]["completion_tokens"]
-	articles["summary"].append(summary)
-	articles["tokens_sent"].append(tokens_sent)
-	articles["tokens_received"].append(tokens_received)
+	articles[url]["summary"] = summary
+	articles[url]["tokens_sent"] = tokens_sent
+	articles[url]["tokens_received"] = tokens_received
+	articles[url]["summarised"] = True
+	articles[url]["summary_count"] = word_count(summary)
 
 
-def get_summary(articles):
-	for text, word_count in zip(articles["text"], articles["word_count"]):
-		prompt = compose_prompt(text, word_count)
-		response = post(prompt)
-		if response is not None:
-			process_response(response, articles)
+def get_summary():
+	articles = load_data()
+	inwindow = isinwindow(articles)
+	for url, article in inwindow.items():
+		if not article["summarised"]:
+			body = article["body"]
+			count = article["body_count"]
+			prompt = compose_prompt(body, count)
+			response = post(prompt)
+			if response is not None:
+				logger.info(f"Response received, processing response for {url}")
+				process_response(response, url, articles)
+				logger.info(f"Summarised {url}")
+	save_data(articles)
 

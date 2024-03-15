@@ -1,5 +1,6 @@
 import logging
 from urllib.parse import urljoin
+import json
 
 from bs4 import BeautifulSoup
 
@@ -71,7 +72,7 @@ def scrape_header(url):
         headline = ld_json["headline"]
         description = ld_json["description"]
     except KeyError as err:
-        logger.error(f"Missing key: {err}")
+        logger.error(f"Missing key: {err} {url}")
         return None
     published = parse_datetime(published)
     modified = parse_datetime(modified)

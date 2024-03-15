@@ -2,8 +2,9 @@ import logging
 import logging.config
 
 from scraping.scrape import scrape
-from data_manager.manager import load_data, save_data, merge_data
-
+from data_manager.manager import *
+from gui.gui import *
+from summary.summarise import get_summary
 
 def setup_logging():
     """
@@ -33,12 +34,9 @@ def setup_logging():
             },
         }
     })         
-
-
-
 if __name__ == '__main__':
     setup_logging()
-    articles = load_data()
-    new_articles = scrape(articles)
-    merged_data = merge_data(articles, new_articles)
-    save_data(merged_data)
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

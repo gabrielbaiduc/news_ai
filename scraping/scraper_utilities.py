@@ -24,13 +24,12 @@ def flag_outdated_url(url, articles):
     articles[url] = {
         "outdated": True,
         "scraped": False,
-        "in_window": False,
     }
 
 
 def tolerance_limit_reached(urls, index, articles):
     logger.warning(f"Outdated tolerance limit reached {urls[index]}")
     for url in urls[index:]:
-        update_outdated(url, articles)
+        flag_outdated_url(url, articles)
 
 

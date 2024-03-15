@@ -105,5 +105,5 @@ def post(data):
         return None
     else:
         logger.info(f"Status: {response.status_code} - {url}")
-
+    print(f"Good response {response.status_code}")
     return response

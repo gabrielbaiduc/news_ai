@@ -41,5 +41,12 @@ def merge_data(old, new):
     else:
         return new
 
-def shift_window(data):
-    return None
+def update_outdated():
+    articles = load_data()
+    counter = 0
+    for url, article in articles.items():
+        if not article["outdated"] and isoutdated(article["published"], 24):
+            article["outdated"] = True
+            counter += 1
+    logger.info(f"Articles processed, {counter} articles were flagged as outdated")
+    save_data(articles)

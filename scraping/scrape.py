@@ -3,6 +3,7 @@ import logging
 from scraping.scrapers import *
 from scraping.scraper_utilities import *
 from utils.helpers import *
+from data_manager.manager import *
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ def handle_urls(section, articles):
 
         # DateCheck: published more than 36h ago? flag outdated and store ...
         # for future LinkChecks
-        if outdated(published, 36):
+        if isoutdated(published, 24):
             flag_outdated_url(url, articles)
             # Tolerance: when 0, all articles left in section are outdated ...
             tolerance -= 1
@@ -43,22 +44,23 @@ def handle_urls(section, articles):
         # ScrapeBody: scrape and validate body
         body = scrape_text(url, source)
         if not body:
+            flag_outdated_url(url, articles)
             continue
 
         # AllChecksPass: article is green, flag scraped and in_winow, store
         articles[url] = {
             "outdated": False,
             "scraped": True,
-            "in_window": True,
+            "summarised": False,
             "published": published,
             "modified": modified,
             "last_checked": get_current_time(),
+            "body_count": word_count(body),
+            "category": [category],
+            "source": source,
             "headline": headline,
             "description": description,
             "body": body,
-            "body_count": word_count(body),
-            "category": [category],
-            "source": source
         }
 
         # Tolerance: reset for succesful scrape
@@ -74,12 +76,12 @@ def handle_sections(section_urls):
     return articles
 
 
-
-
-def scrape(data):
-    sources= ["aj", "bbc", "nyt", "ap"]
+def scrape():
+    existing_articles = load_data()
+    sources = ["aj", "bbc", "nyt", "ap"]
     # LinkList: get list of URLs from section, 10-50 links\section
-    section_urls = scrape_urls_from_sections(sources, data)
+    section_urls = scrape_urls_from_sections(sources, existing_articles)
     new_articles = handle_sections(section_urls)
     count_new_articles(new_articles)
-    return new_articles
+    merged_data = merge_data(existing_articles, new_articles)
+    save_data(merged_data)
