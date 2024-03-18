@@ -1,10 +1,7 @@
 import logging
 import logging.config
 
-from scraping.scrape import scrape
-from data_manager.manager import *
 from gui.gui import *
-from summary.summarise import get_summary
 
 def setup_logging():
     """
@@ -23,7 +20,7 @@ def setup_logging():
         },
         'formatters': {
             'detailed': {
-                'format': '%(asctime)s %(levelname)s \t\t %(message)s'
+                'format': '%(asctime)s %(levelname)s %(name)s %(message)s'
             },
         },
         'loggers': {

@@ -39,11 +39,15 @@ class ClickableTooltip(QLabel):
 class CustomLabel(QLabel):
     """CustomLabel with clickable tooltips showing title, URL, and source."""
 
-    def __init__(self, text, title, url, source, parent, mainWindow):
+    def __init__(
+        self, text, title, url, source, bodycount, relsize, parent, mainWindow
+        ):
         super().__init__(text, parent)
         self.title = title
         self.url = url
         self.source = source
+        self.bodycount = bodycount
+        self.relsize = relsize
         self.mainWindow = mainWindow
         self.tooltipWidget = ClickableTooltip(self)
         self.tooltipWidget.hide()
@@ -55,8 +59,19 @@ class CustomLabel(QLabel):
         if self.tooltipVisible:
             self.tooltipWidget.hide()
         else:
-            source = f"<span style='color:black;'> - {self.source}</span>"
-            tooltipText = f'<a href="{self.url}">{self.title}</a><i>{source}</i>'
+            source = (
+                f"<span style='color:black;'> - <i>{self.source}</i></span>"
+                )
+            count = (
+                f"<span style='color:black;'> - <i>{self.bodycount}</i></span>"
+                )
+            relsize = (
+                f"<span style='color:black;'> - <i>{self.relsize}%</i></span>"
+                )
+            tooltipText = (
+                f"<a href='{self.url}'>{self.title}</a>"
+                f"{source}{count}{relsize}"
+                )
             globalPos = self.mapToGlobal(QPoint(10, -30))
             self.tooltipWidget.setText(tooltipText)
             self.tooltipWidget.move(globalPos)
