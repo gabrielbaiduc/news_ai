@@ -4,8 +4,8 @@ import logging
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from data_manager.manager import DataManager
-from scraping.scrapers import FetchHTML, ScrapeLinks, ScrapeContents
-from summary.summarise import Summary, PostJSON
+from scraping.scrape import FetchHTML, ScrapeLinks, ScrapeContents
+from summarising.summarise import Summary, PostJSON
 from utils.helpers import PrepareForGUI
 from config.settings import sections
 

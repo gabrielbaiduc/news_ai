@@ -1,7 +1,7 @@
 import logging
 import logging.config
 
-from gui.gui import *
+from gui.main_window import *
 
 def setup_logging():
     """
@@ -13,7 +13,7 @@ def setup_logging():
         'handlers': {
             'fileHandler': {
                 'class': 'logging.FileHandler',
-                'filename': 'logs/scraping.log',  
+                'filename': 'logs/logs.log',  
                 'mode': 'a',  
                 'formatter': 'detailed',  
             },

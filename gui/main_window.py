@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont, QMovie
 from PyQt5.QtCore import Qt, QEvent, QSize
 
-from gui.tooltip import CustomLabel
+from gui.widgets import CustomLabel
 from gui.backend import ArticleProcessor
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,9 @@ class MainWindow(QMainWindow):
         self.status_label.setStyleSheet("color: #979797;")
 
         self.spinner_label = QLabel()
-        self.spinner_movie = QMovie("/Users/gabbai/news_ai/gui/resources/transp.gif")
+        self.spinner_movie = QMovie(
+            "/Users/gabbai/news_ai/gui/resources/loader.gif"
+            )
         self.spinner_label.setMovie(self.spinner_movie)
         self.spinner_movie.start()
         self.spinner_movie.setScaledSize(QSize(40, 40))
