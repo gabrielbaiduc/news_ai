@@ -1,3 +1,37 @@
+# Configuration data for operations across the program. 
+# The 'sections' and 'selectors' are used in scraping and define the logic of 
+# the program. The sections list contain urls of sections within news-sites.
+# Each section url is grouped by source and category, where the category is a 
+# somewhat arbitrary choice that I made. Eg.: I choose to put
+# Australia section to Asia which is arbitrary. Also, using CSS 
+# selectors to scrape article links and contents is not the best. 
+# I recognise that this is a very static, stiff and fragile solution to 
+# scraping articles. 
+
+# I decided to include the category and source information of each section 
+# because it made scrapin easier. The categories are used to group the articles
+# when displayed. The sources are used to navigate the custom selectors. Again,
+# this is a clunky solution that introduces a bunch of loops and tuple unpacking
+# but it made the implementation simpler. In an ideal world I have a set of 
+# heuristcs applicable for most news-sites where source doesn't have to be 
+# tracked. I'd also have a topic modelling algorithm with keyword extraction 
+# that automatically categorises the articles in a more organic way. 
+
+# NOTE: the best and most elegant solution would be to train one or two 
+# transformers that can extract article links and contents from parsed
+# (or unparsed) HTML data. Then, implement a crawler that crawls the front-page
+# and sections of news-sites and creates a data-loop with the model(s). The 
+# crawler fetches HTMLs for the models. The models either extract links that are 
+# passed to the crawler or contents which are stored. Upload the program to a 
+# server, implement careful rate-limiting and depth-limiting for the crawler and
+# you have a system that can scrape a huge number of news-sites 24/7, keeping
+# a comprehensive stockpile of the freshest articles that can be used for 
+# analytics and display.
+
+# ToDo:
+# 1) Add Guardian, SkyNews, CNN and potentially other sources.
+
+# List of urls grouped by source and custom category. 
 sections =[
         # ("https://www.bbc.com/news/world/africa", "BBCNews","Africa"),
         # ("https://www.bbc.com/news/world/asia", "BBCNews", "Asia"),
@@ -40,6 +74,7 @@ sections =[
         ("https://apnews.com/hub/australia", "APNews", "Asia")
 ]
 
+# Selectors for links, link prefixes, article text and header element
 selectors = {
     "link_selector": {
         "BBCNews": "div[data-testid='alaska-section'] a",
@@ -67,6 +102,8 @@ selectors = {
     }
 }
 
+# List of user agents used for rotating user agents when fetching HTML of 
+# news sites
 user_agents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
     "like Gecko) Chrome/58.0.3029.110 Safari/537.3",
@@ -93,9 +130,21 @@ user_agents = [
     "like Gecko) Chrome/62.0.3202.94 Safari/537.36 OPR/49.0.2725.64"
 ]
 
-# OpenAI API key and header 
-api_key = "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"
-openai_headers = {"Authorization": f"Bearer {api_key}"}
-openai_endpoint = "https://api.openai.com/v1/chat/completions"
-gpt_model = "gpt-3.5-turbo-0125"
+# Keyring constats for storing and retrieving the OpenAI API key
+kr_system = "News-AI"
+kr_username = "openai_api_key"
 
+
+# Description displayed on the landing screen of the app
+app_description = (
+    f"An app for those with a busy schedule and a misplaced sense of \n"
+    f"civic responsibility.\nWith News-AI you can claw your way "
+    f"through your daily gobblet of good vibes with unparalled "
+    f"efficiency.\nNo jokes, but this little app cuts your "
+    f"laugther lixir quota by at least 80%,\ngivin you much needed "
+    f"time to have lunch or do some work. \n"
+    f"Or whatever...\n"
+    f"Just press start and get your silly syrup segment.\n"
+    f"Powered by the robots over at OpenAI.\n"
+    f"Oh, and, this shit is not free. Nothing in life is."
+    )

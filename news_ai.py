@@ -3,6 +3,10 @@ import logging.config
 
 from gui.main_window import *
 
+# The main python file, used to launch the application. It configures logging
+# then launches the PyQT5 app which handles all of the logic. 
+
+
 def setup_logging():
     """
     Configures the logging settings for the application.
@@ -30,7 +34,9 @@ def setup_logging():
                 'propagate': True, 
             },
         }
-    })         
+    })    
+
+
 if __name__ == '__main__':
     setup_logging()
     app = QApplication(sys.argv)

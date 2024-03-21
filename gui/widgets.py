@@ -1,32 +1,25 @@
-from PyQt5.QtWidgets import QLabel, QApplication, QWidget
+from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QVBoxLayout
 from PyQt5.QtCore import Qt, QRectF, QPoint
 from PyQt5.QtGui import QPainter, QPainterPath, QBrush, QColor
 
 
-class ClickableTooltip(QLabel):
+class ClickableTooltip(QWidget):
+    """ 
+    Custom QWidget. Handles the appearence and behaviour of the clickable 
+    tooltip window. This window contains information about the original article
+    and summary.
     """
-    Custom QLabel for tooltips with rounded corners, supports rich text and 
-    inks.
-    """
-
     def __init__(self, parent=None):
+        """ Initialise a Popup style window with a vertical layout. """
         super().__init__(parent)
-        self.setWindowFlags(Qt.ToolTip)
-        # self.setTextFormat(Qt.RichText)
-        # self.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        self.setOpenExternalLinks(True)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.hide()
-        self.setStyleSheet("""
-            ClickableTooltip {
-                font-family: 'Avenir Next';
-                font-size: 12pt;
-                margin: 8px;
-            }
-            """)
+        self.setWindowFlags(Qt.Popup)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(5, 10, 5, 10)
+        self.setLayout(layout)
+        self.adjustSize() # Adjusts window size
 
     def paintEvent(self, event):
-        """Draws rounded corners for the tooltip."""
+        """ Redraws the clickable tooltip window with rounded corners. """
         rectF = QRectF(self.rect())
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -37,44 +30,60 @@ class ClickableTooltip(QLabel):
 
 
 class CustomLabel(QLabel):
-    """CustomLabel with clickable tooltips showing title, URL, and source."""
-
-    def __init__(
-        self, text, title, url, source, bodycount, relsize, parent, mainWindow
-        ):
+    """
+    Custom QLabel. This is the main container for the article summary.
+    The custom funcionality handles the `ClicableTooltip` window that shows
+    article related meta information.
+    """
+    def __init__(self, text, article, parent):
+        """ Initialise the text, the `CustomTooltip` widget and metadata. """
         super().__init__(text, parent)
-        self.title = title
-        self.url = url
-        self.source = source
-        self.bodycount = bodycount
-        self.relsize = relsize
-        self.mainWindow = mainWindow
+        self.article = article
         self.tooltipWidget = ClickableTooltip(self)
         self.tooltipWidget.hide()
-        self.tooltipVisible = False
-        mainWindow.registerCustomLabel(self)
 
     def mousePressEvent(self, event):
-        """Toggles tooltip visibility on click."""
-        if self.tooltipVisible:
-            self.tooltipWidget.hide()
-        else:
-            source = (
-                f"<span style='color:black;'> - <i>{self.source}</i></span>"
-                )
-            count = (
-                f"<span style='color:black;'> - <i>{self.bodycount}</i></span>"
-                )
-            relsize = (
-                f"<span style='color:black;'> - <i>{self.relsize}%</i></span>"
-                )
-            tooltipText = (
-                f"<a href='{self.url}'>{self.title}</a>"
-                f"{source}{count}{relsize}"
-                )
-            globalPos = self.mapToGlobal(QPoint(10, -30))
-            self.tooltipWidget.setText(tooltipText)
-            self.tooltipWidget.move(globalPos)
-            self.tooltipWidget.show()
-        self.tooltipVisible = not self.tooltipVisible
+        """ 
+        Event listener. With each click on the main QLabel a tooltip text is 
+        composed and added to the tooltip. A useful property of `ClickableTooltip`
+        is the `Qt.Popup` window flag which ensures that the tooltip window 
+        disappears whenever we click outside of it. This behaviour eliminates
+        the need to listed for multiple click-events, then manually show or hide
+        the tooltip, resulting in much cleaner code. A downside is that the 
+        tooltip draws focus so scrolling is disabled and we must first 
+        "click away" the tooltip before other actions are permitted within
+        the app.
+        """
         super().mousePressEvent(event)
+        # This ensures that the tooltip associated with each main QLabel is 
+        # refreshed with each click, without this the tooltip text would 
+        # accumulate within the tooltip window.
+        for i in reversed(range(self.tooltipWidget.layout().count())): 
+            self.tooltipWidget.layout().itemAt(i).widget().setParent(None)
+        # Compose the tooltip text add it to the tooltip window, place the 
+        # window in relation to the main QLabel and show.
+        tooltipText = self._composeTooltipText()
+        globalPos = self.mapToGlobal(QPoint(10, -30))
+        label = QLabel(tooltipText, self.tooltipWidget)
+        label.setOpenExternalLinks(True)
+        self.tooltipWidget.layout().addWidget(label)
+        self.tooltipWidget.move(globalPos)
+        self.tooltipWidget.show()
+
+    def _composeTooltipText(self):
+        """ Responsible for formattin and composing the tooltip text. """
+        link_style = "color:blue; text-decoration:none;"
+        info_style = "color:black; margin-left: 5px;"
+        italic_style = "font-style:italic;"
+
+        tooltipText = f"""
+        <a href='{self.article["url"]}'>{self.article["headline"]}</a>
+        <span style='{info_style}'>
+            - <span style='{italic_style}'>{self.article["source"]}</span>
+            - {self.article["bodycount"]}
+            - {self.article["summarycount"]}
+            - {self.article["relativesize"]}%
+        </span>
+        """
+        return tooltipText.strip()
+
