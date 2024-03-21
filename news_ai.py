@@ -4,7 +4,7 @@ import logging.config
 from gui.main_window import *
 
 # The main python file, used to launch the application. It configures logging
-# then launches the PyQT5 app which handles all of the logic. 
+# then launches the PyQT5 app which does the rest of the work. 
 
 
 def setup_logging():

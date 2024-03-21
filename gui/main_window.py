@@ -15,9 +15,9 @@ from gui.backend import ArticleProcessor
 from config.settings import kr_system, kr_username, app_description
 
 # This module wraps most of the application logic. 
-# The MainWindow handles most of the GUI elements and handles the bakcend logic
-# with a backend thread. The 3 stages of the GUI are the:
-#   1) the landing screen: that contains a welcome message and user-data entry 
+# The MainWindow handles the GUI elements and handles the backcend logic on
+# a separate thread. The 3 stages of the GUI are the:
+#   1) the landing screen: contains a welcome message and data-entry 
 #       protocols. It handles secret keys with keyring that uses OS specific 
 #       secure key storage like 'Keychain'
 #   2) the loading screen: dynamic loading screen that informs users on the 
@@ -126,24 +126,16 @@ class MainWindow(QMainWindow):
         # Adding top spacer, contents go between here and bottom spacer
         main_v_layout.addSpacerItem(top_spacer)
 
-        # Adding welcome and introduction
+        # Adding welcome 
         welcome_label = QLabel("Welcome to News-AI")
         welcome_label.setStyleSheet("color: #979797;")
         welcome_label.setFont(self.set_font(20))
         welcome_label.setAlignment(Qt.AlignCenter)
         main_v_layout.addWidget(welcome_label)
 
-        # Adding description 
-        description_label = QLabel(app_description)
-        description_label.setFont(self.set_font(14))
-        description_label.setAlignment(Qt.AlignCenter)
-        description_label.setStyleSheet("color: #979797;")
-        main_v_layout.addWidget(description_label)
-
         # Adding Start button
         button = QPushButton("Start")
         button.setFont(self.set_font(14))
-        # button.setMaximumWidth(200)
         button.setStyleSheet("color: #979797;")
         button.clicked.connect(self.start_api)
         button_h_layout = QHBoxLayout()
@@ -153,20 +145,6 @@ class MainWindow(QMainWindow):
 
         # Adding bottom spacer
         main_v_layout.addSpacerItem(bottom_spacer)
-
-
-        # Adding signature label and signature
-        signature_h_layout = QHBoxLayout()
-        signature_h_layout.setAlignment(Qt.AlignCenter)
-        main_v_layout.addLayout(signature_h_layout)
-        signature_label = QLabel("Created by:")
-        signature_label.setFont(self.set_font(12))
-        signature_label.setAlignment(Qt.AlignCenter)
-        signature_h_layout.addWidget(signature_label)
-        signature_label = QLabel("Gabai")
-        signature_label.setFont(self.set_font(14, family="Brush Script MT"))
-        signature_label.setAlignment(Qt.AlignCenter)
-        signature_h_layout.addWidget(signature_label)
 
 
     def start_noapi(self):

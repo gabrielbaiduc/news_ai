@@ -54,28 +54,43 @@ class CustomLabel(QLabel):
         "click away" the tooltip before other actions are permitted within
         the app.
         """
+        # Listening for mouse click
         super().mousePressEvent(event)
-        # This ensures that the tooltip associated with each main QLabel is 
+
+        # Deleting tooltips text
+        # This code ensures that the tooltip associated with each main QLabel is 
         # refreshed with each click, without this the tooltip text would 
         # accumulate within the tooltip window.
         for i in reversed(range(self.tooltipWidget.layout().count())): 
             self.tooltipWidget.layout().itemAt(i).widget().setParent(None)
-        # Compose the tooltip text add it to the tooltip window, place the 
-        # window in relation to the main QLabel and show.
+
+        # Composing the tooltip text
         tooltipText = self._composeTooltipText()
-        globalPos = self.mapToGlobal(QPoint(10, -30))
+
+        # Calculating position of tooltip window
+        globalPos = self.mapToGlobal(QPoint(5, -30))
+
+        # Adding tooltip text to tooltip window, enabling external links
         label = QLabel(tooltipText, self.tooltipWidget)
         label.setOpenExternalLinks(True)
+
+        # Adding tooltip text to layout within tooltip window
         self.tooltipWidget.layout().addWidget(label)
+
+        # Positioning the tooltip window 
         self.tooltipWidget.move(globalPos)
+
+        # Showing the tooltip window
         self.tooltipWidget.show()
 
     def _composeTooltipText(self):
         """ Responsible for formattin and composing the tooltip text. """
+        # Formatting tooltip meta-data
         link_style = "color:blue; text-decoration:none;"
         info_style = "color:black; margin-left: 5px;"
         italic_style = "font-style:italic;"
 
+        # Composing tooltip text
         tooltipText = f"""
         <a href='{self.article["url"]}'>{self.article["headline"]}</a>
         <span style='{info_style}'>
