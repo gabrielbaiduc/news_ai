@@ -165,7 +165,7 @@ class PostJSON:
         """
 
         # Retrieving auth. key
-        api_key = keyring.get_password("News-AI", "openai_api_key")
+        api_key = keyring.get_password(kr_system, kr_username)
 
         # Composing header with auth. key
         headers = {"Authorization": f"Bearer {api_key}"}
