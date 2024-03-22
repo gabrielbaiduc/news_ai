@@ -29,11 +29,6 @@ from config.settings import kr_system, kr_username
 #       summary.
 
 # ToDo:
-# 1) Clear up `init_main_article`
-# 2) Merge the `api` and `noapi` landing and start button logic
-# 3) Add welcome text
-# 4) Add error messages to the UI when clicking `Start` and API is invalid or 
-#   not entered
 # 5) Add option to change API key once saved
 
 # Initialising logging and keyring constants
@@ -47,7 +42,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Set window size and title on open
-        self.setWindowTitle("News-AI")
+        self.setWindowTitle("NewsAI")
         self.setGeometry(100, 100, 800, 1000)
 
         # Installing scrolling event filter to hide tooltips on scroll
