@@ -1,5 +1,5 @@
 # NewsAI
-An end-to-end project that I created for fun. It's a program that scrapes articles from a few static websites (NYTimes, APNews and Al-Jazeera), summarises them with the OpenAI API (paid service) then group each article based on how similar they are and merge the summaries of the grouped articles. Finally the summaries are displayed via a simple desktop application. For each summary you can access it's title with a link back to the original article and the source of the article by clicking on the summary. 
+An end-to-end project that I created for fun. It's a program that scrapes articles from a few static websites (NYTimes, APNews and Al-Jazeera), summarises them with the OpenAI API (paid service) then groupc each article based on how similar they are and mergec the summaries of the grouped articles. Finally the summaries are displayed via a simple desktop application. For each summary you can access it's title with a link back to the original article and the source of the article by clicking on the summary. 
 
 I've had my mind to built something comprehensive related to analysing news. I've also been hearing a lot of good things about ChatGPT so I came up with this idea to work on. 
 
