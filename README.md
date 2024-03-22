@@ -15,12 +15,17 @@ To install conda visit either <a href="https://docs.anaconda.com/free/anaconda/i
 
 ### Step 2 Create your virtual environment
 Open your command line interface and navigate to the program folder then type 
+
 ```conda env create -f environment.yml```
 
 ### Step 3 Activate your virtual envirnomen
 Once the dependencies are installed, type:
+
 ```conda activate newsai```
+
 then (ensure you're in the program folder) type:
+
 ```python newsai.py```
+
 Give it a few minutes to do it's work. It takes longer on the first run as there are hundreds of articles go work through and HTTP requests can be slow both ways.
 
