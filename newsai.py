@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import logging
 import logging.config
 
@@ -34,11 +36,25 @@ def setup_logging():
                 'propagate': True, 
             },
         }
-    })    
+    })
+
+def initialise_datafiles():
+    base_dir = Path(__file__).resolve().parent
+    filenames = ["articles.json", "discarded.json", "archived.json"]
+    for filename in filenames:
+        path = base_dir / "data" / filename
+        if not path.exists():
+            empty_file = []
+            with open(path, "w") as file:
+                json.dump(empty_file, file)
+                logging.info(f"Initialised {filename}.")
+        else:
+            pass
 
 
 if __name__ == '__main__':
     setup_logging()
+    initialise_datafiles()
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()

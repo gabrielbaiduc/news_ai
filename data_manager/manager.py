@@ -10,6 +10,9 @@ import logging
 #   main use is in 'gui/backend.py' so rewrite the thread class to handle data
 #   management better.
 # 2) fix circular import with 'utils/helpers.py' using 'isoutdated'
+# 3) Merge the 3 datafiles into one, handle it like a dictionary with the 
+#   3 parts being keys.
+
 logger = logging.getLogger(__name__)
 
 
