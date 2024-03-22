@@ -89,8 +89,8 @@ class MainWindow(QMainWindow):
 
     def add_welcome_label(self, layout, api_key_exists):
         """Add a welcome label to the layout."""
-        text = ("Welcome to News-AI" if not api_key_exists 
-            else "Welcome back to News-AI")
+        text = ("Welcome to NewsAI" if not api_key_exists 
+            else "Welcome back to NewsAI")
         label = QLabel(text)
         label.setAlignment(Qt.AlignCenter)
         label.setFont(self.set_font(20))

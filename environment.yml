@@ -1,4 +1,4 @@
-name: newenv
+name: newsai
 channels:
   - conda-forge
 dependencies:

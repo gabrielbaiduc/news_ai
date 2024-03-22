@@ -131,7 +131,7 @@ user_agents = [
 ]
 
 # Keyring constats for storing and retrieving the OpenAI API key
-kr_system = "News-AI"
+kr_system = "NewsAI"
 kr_username = "openai_api_key"
 
 # Parameter grid for the custom parameter search in 'grouping/group.py'
