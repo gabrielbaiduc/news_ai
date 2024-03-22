@@ -1,11 +1,11 @@
 # NewsAI
 An application that scrapes articles from a few 'static' websites (NYTimes, APNews and Al-Jazeera), summarises them with the OpenAI API (paid service), then groups each article based on how similar they are and merges the summaries of the grouped articles. Finally, the summaries are displayed via a simple desktop application. For each summary; you can access it's title with a link back to the original article and the source of the article by clicking on the summary. The articles are categorised by region. It's purpose is to streamline and shorten the act of cathcing up with the news. Gives you the ability to scan through hunderds of articles in 30 minutes with the option of diving deeper in topics of interests by reading the original article.
 
-# Usage
 When launched for the first time you'll be greeted with a welcome message and prompted to enter you OpenAI API key so have it ready. Once you've enterd a valid API key it is saved to your OS-specific password manager (change your key here if you want to, search for 'NewsAI') and the program starts preparing you the articles. On initial launch (or after longer breaks) this can take anywhere between 5-10 minutes. 
 
 # Notes:
 The NYTimes is subscription based service with a quota of free articles. If you want to read it, you must register, subscribe and log-in on your computer.
+OpenAI's API is a paid service. The app uses the `gpt-3.5-turbo-0125` model. For more info on pricing visit <a href="https://openai.com/pricing#language-models">OpenAI</a>.
 
 There are plans for numerous smaller improvements.
 User-experience:
