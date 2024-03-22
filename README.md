@@ -27,5 +27,5 @@ then (ensure you're in the program folder) type:
 
 ```python newsai.py```
 
-Give it a few minutes to do it's work. It takes longer on the first run as there are hundreds of articles go work through and HTTP requests can be slow both ways.
+Give it a few minutes to do it's work. It takes longer on the first run as there are hundreds of articles to work through.
 
