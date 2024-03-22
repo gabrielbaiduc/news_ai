@@ -51,8 +51,7 @@ If Conda is not already installed on your system, download it from either [minic
 
 With Conda installed, open your command line interface and navigate to the NewsAI program folder. Create the environment with the following command:
 
-```bash
-conda env create -f environment.yml```
+```conda env create -f environment.yml```
 
 ### Step 3: Activate Your Virtual Environment
 Activate the newly created environment:
