@@ -45,7 +45,7 @@ To use NewsAI, follow these steps:
 
 ### Step 1: Install Conda
 
-If Conda is not already installed on your system, download it from either [miniconda](https://docs.anaconda.com/free/anaconda/install/index.html) or [miniforge](https://github.com/conda-forge/miniforge). Miniforge is recommended, but either will suffice. Alternatively, you can use Anaconda.
+If Conda is not already installed on your system, download it from either [miniconda](https://docs.anaconda.com/free/anaconda/install/index.html) or [miniforge](https://github.com/conda-forge/miniforge) and follow the instructions. Miniforge is recommended, but either will suffice. Alternatively, you can use Anaconda.
 
 ### Step 2: Create Your Virtual Environment
 
