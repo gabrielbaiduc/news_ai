@@ -4,7 +4,8 @@ An application that scrapes articles from a few 'static' websites (NYTimes, APNe
 When launched for the first time you'll be greeted with a welcome message and prompted to enter you OpenAI API key so have it ready. Once you've enterd a valid API key it is saved to your OS-specific password manager (change your key here if you want to, search for 'NewsAI') and the program starts preparing you the articles. On initial launch (or after longer breaks) this can take anywhere between 5-10 minutes. 
 
 # Notes:
-The NYTimes is subscription based service with a quota of free articles. If you want to read it, you must register, subscribe and log-in on your computer.
+The NYTimes is subscription based service with a quota of free articles. If you want to read beyont the free-quota using NewsAI, you must subscribe and log-in on your computer.
+
 OpenAI's API is a paid service. The app uses the `gpt-3.5-turbo-0125` model. For more info on pricing visit <a href="https://openai.com/pricing#language-models">OpenAI</a>.
 
 There are plans for numerous smaller improvements.
