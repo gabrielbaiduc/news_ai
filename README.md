@@ -1,49 +1,64 @@
 # NewsAI
-An application that scrapes articles from a few 'static' websites (NYTimes, APNews, and Al-Jazeera), summarizes them with the OpenAI API (a paid service), then groups each article based on similarity and merges the summaries of the grouped articles. Finally, the summaries are displayed via a simple desktop application. For each summary, you can access its title with a link back to the original article and the source of the article by clicking on the summary. The articles are categorized by region. Its purpose is to streamline and shorten the act of catching up with the news. It gives you the ability to scan through hundreds of articles in 30 minutes, with the option of diving deeper into topics of interest by reading the original article.
 
-When launched for the first time, you'll be greeted with a welcome message and prompted to enter your OpenAI API key, so have it ready. Your key is saved using your operating system's password manager (change your key here if you want to, search for 'NewsAI'). On initial launch (or after longer breaks), the preparation of articles can take anywhere between 5-10 minutes.
+NewsAI is an innovative application that streamlines news consumption. It aggregates articles from NYTimes, APNews, and Al-Jazeera. These articles are then summarized using the OpenAI API, a premium service. The application groups articles by their similarities and merges the summaries for a concise overview. Summaries are accessible via a straightforward desktop interface, where users can click on a summary to view the article's title, a link to the original piece, and its source. Articles are organized by region, facilitating a quick catch-up with global news. NewsAI allows users to browse through hundreds of articles in just 30 minutes, offering the option to delve deeper into intriguing topics by visiting the original articles.
 
-# Notes:
-The NYTimes is a subscription-based service with a quota of free articles. If you want to read beyond the free quota using NewsAI, you must subscribe and log in on your computer.
+## First Launch
 
-OpenAI's API is a paid service. The app uses the `gpt-3.5-turbo-0125` model. For more info on pricing, visit [OpenAI](https://openai.com/pricing#language-models).
+Upon the first launch, users are welcomed with a message and are prompted to input their OpenAI API key. Please have your key ready. The key is securely stored using your operating system's password manager. For adjustments, search for 'NewsAI' within your password manager. Initial setup, or re-initialization after a significant break, may take between 5-10 minutes as the application prepares the articles.
 
-Planned user experience updates:
-- Ability to change the API key
-- Add a refresh button that updates articles in the background and pushes them to the top (visually flagging new articles)
-- Add a toolkit that allows users to customize how ChatGPT summarizes the articles or change model types (currently uses gpt-3.5)
-- Implement a solution so that grouped articles with merged summaries have the option to show the individual summaries of all the components
-- Add an Analytics window that shows various statistics about the articles
+## Notes
+
+- **NYTimes Access:** The NYTimes website operates on a subscription model, offering a limited number of free articles. To access content beyond this quota via NewsAI, a subscription and login on your device are required.
   
-Planned technical updates:
-- Improve class implementation them better (e.g., combined web operations, combined scraping and summary operations)
-- Improve data structure and handling
-- Cleaner docstrings and comments
-- Improve filtering on link and content scraping
+- **OpenAI API Costs:** NewsAI utilizes the `gpt-3.5-turbo-0125` model from OpenAI, which is a paid service. For pricing details, please visit [OpenAI's pricing page](https://openai.com/pricing#language-models).
 
-Below are a few major update ideas that I have. The chance that I'll develop them is small, for two reasons: copyright laws and the prohibitive cost of summarization via OpenAI. As it stands, this is an open-source portfolio project that I work on in my free time. If there is substantial interest in the app from the open-source community and there are ways to overcome the above concerns, I'll be more likely to invest more time in it.
+## Upcoming Features
 
-A major planned update—if I get around to it—would be to introduce more static websites that can be scraped, like FT, WSJ, BBC, Politico, Economist, IndiaTimes, GlobalTimes, TheTimes, Guardian, BuzzFeed, Euronews, and more regional English language papers. Add these as options for users.
+### User Experience Enhancements
 
-Another major update idea is the introduction of topic detection and categorization. This is an extension of the grouping concept, where articles are scraped without regard to what section they were scraped from. Instead, the categories are inferred from the text.
+- **API Key Management:** Users will have the option to update their OpenAI API key.
+- **Article Refresh:** A new button will refresh articles in the background, bringing new stories to the top and marking them for visibility.
+- **Custom Summarization:** A toolkit for customizing how ChatGPT summarizes articles or selecting different model versions (default is gpt-3.5-turbo-0125).
+- **Summary Grouping:** Implementation of an option to view individual summaries within merged article groups.
+- **Analytics Dashboard:** Introduction of a window displaying various statistics about the articles for enhanced insight.
 
-Lastly, I'd like to develop a separate framework to scrape articles. Inspired by the Python library 'Newspapers', it would utilize ML to recognize HTMLs that contain article-like content and scrape the contents regardless of the unique HTML structure of the website. 'Newspapers' implements a heuristic approach where the general rules were discovered 'manually' and implemented as rules. The ML method has the added benefit of being able to scrape not just news sites but think tanks, magazines, or even blogs.
+### Technical Improvements
 
-# Installation
-You'll need to download this repository to your computer, and you'll need Conda installed on your computer. Download the repo; if you already have Conda installed, skip to Step 2.
+- **Class Implementation:** Streamlining and enhancing class structures for better data management and operational efficiency.
+- **Data Structure and Handling:** Refining the underlying data architecture for improved performance and reliability.
+- **Documentation:** Enhanced docstrings and comments for better code clarity.
+- **Content Filtering:** Improvements to the filtering process for links and article content.
+
+## Future Directions
+
+Given the challenges posed by copyright laws and the costs associated with OpenAI summarization, the development of these features remains uncertain. However, should there be significant interest from the open-source community and viable paths to address these challenges, I may pursue further development.
+
+### Major Updates Considered
+
+- **Expansion of Source Websites:** Potential inclusion of additional news outlets such as FT, WSJ, BBC, Politico, Economist, and others for broader coverage.
+- **Topic Detection and Categorization:** Enhancing article grouping through advanced topic analysis, moving beyond predefined sections.
+- **Advanced Scraping Framework:** Development of a machine learning-based framework for identifying and extracting article-like content from various web formats, inspired by the 'Newspapers' Python library.
+
+## Installation
+
+To use NewsAI, follow these steps:
+
 ### Step 1: Install Conda
-To install Conda, visit either [miniconda](https://docs.anaconda.com/free/anaconda/install/index.html) or [miniforge](https://github.com/conda-forge/miniforge) and follow the instructions. I recommend miniforge, but use whichever.
 
-### Step 2: Create your virtual environment
-Open your command line interface and navigate to the program folder, then type:
+If Conda is not already installed on your system, download it from either [miniconda](https://docs.anaconda.com/free/anaconda/install/index.html) or [miniforge](https://github.com/conda-forge/miniforge). Miniforge is recommended, but either will suffice. Alternatively, you can use Anaconda.
 
-```conda env create -f environment.yml```
+### Step 2: Create Your Virtual Environment
 
-### Step 3: Activate your virtual environment
-Once the dependencies are installed, type:
+With Conda installed, open your command line interface and navigate to the NewsAI program folder. Create the environment with the following command:
+
+```bash
+conda env create -f environment.yml```
+
+### Step 3: Activate Your Virtual Environment
+Activate the newly created environment:
 
 ```conda activate newsai```
 
-then (ensure you're in the program folder) type:
+To start NewsAI, ensure you are in the program folder and execute:
 
 ```python newsai.py```
