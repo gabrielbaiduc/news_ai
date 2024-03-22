@@ -11,4 +11,4 @@ The major lesson I walk away with is that data is everything. I've spent 90% of 
 # Installation
 You'll need 'conda' installed on your computer to run this program. If you already have 'conda' skip to step 2.
 ### Step 1
-Install conda via the <a>'miniconda'</a> or 'miniforge' distributions. I recommend the 'miniforge'.
+Install conda via the <a href="https://docs.anaconda.com/free/anaconda/install/index.html">miniconda</a> or <a href="https://github.com/conda-forge/miniforge">miniforge</a> distributions. I recommend the 'miniforge'.
