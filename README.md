@@ -9,6 +9,18 @@ This is by no means a complete, user-ready program. There are countless opportun
 The major lesson I walk away with is that data is everything. I've spent 90% of my development time working with data. It's the part of the program that was the hardest to get right - or even just to get it working. I've had numerous ideas on how to implement certain things better while coding. Initially, I followed them up, but as I progressed, I just ended up jotting them down somewhere and moving on. Each new idea would've pushed my deployment up by weeks or months. Data mining, engineering, wrangling, massaging or whatever else you call it, is the essence of ML. I feel good about having had this realisation. It seems to be a recurring theme so I'm looking forward for my next project that is likely to be focused solely on data.
 
 # Installation
-You'll need 'conda' installed on your computer to run this program. If you already have 'conda' skip to step 2.
-### Step 1
+You'll need to download this repository to your computer and you'll need conda installed on your computer. Download the repo, if you already have conda installed, skip to Step 2.
+### Step 1 Install Conda
 To install conda visit either <a href="https://docs.anaconda.com/free/anaconda/install/index.html">miniconda</a> or <a href="https://github.com/conda-forge/miniforge">miniforge</a> and follow the instructions. I recommend mini-forge but use whichever.
+
+### Step 2 Create your virtual environment
+Open your command line interface and navigate to the program folder then type 
+```conda env create -f environment.yml```
+
+### Step 3 Activate your virtual envirnomen
+Once the dependencies are installed, type:
+```conda activate newsai```
+then (ensure you're in the program folder) type:
+```python newsai.py```
+Give it a few minutes to do it's work. It takes longer on the first run as there are hundreds of articles go work through and HTTP requests can be slow both ways.
+
