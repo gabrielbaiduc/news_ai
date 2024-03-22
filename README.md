@@ -1,46 +1,47 @@
 # NewsAI
-An application that scrapes articles from a few 'static' websites (NYTimes, APNews and Al-Jazeera), summarises them with the OpenAI API (paid service), then groups each article based on how similar they are and merges the summaries of the grouped articles. Finally, the summaries are displayed via a simple desktop application. For each summary; you can access it's title with a link back to the original article and the source of the article by clicking on the summary. The articles are categorised by region. It's purpose is to streamline and shorten the act of cathcing up with the news. Gives you the ability to scan through hunderds of articles in 30 minutes with the option of diving deeper in topics of interests by reading the original article.
+An application that scrapes articles from a few 'static' websites (NYTimes, APNews, and Al-Jazeera), summarizes them with the OpenAI API (a paid service), then groups each article based on similarity and merges the summaries of the grouped articles. Finally, the summaries are displayed via a simple desktop application. For each summary, you can access its title with a link back to the original article and the source of the article by clicking on the summary. The articles are categorized by region. Its purpose is to streamline and shorten the act of catching up with the news. It gives you the ability to scan through hundreds of articles in 30 minutes, with the option of diving deeper into topics of interest by reading the original article.
 
-When launched for the first time you'll be greeted with a welcome message and prompted to enter you OpenAI API key so have it ready. Once you've enterd a valid API key it is saved to your OS-specific password manager (change your key here if you want to, search for 'NewsAI') and the program starts preparing you the articles. On initial launch (or after longer breaks) this can take anywhere between 5-10 minutes. 
+When launched for the first time, you'll be greeted with a welcome message and prompted to enter your OpenAI API key, so have it ready. Your key is saved using your operating system's password manager (change your key here if you want to, search for 'NewsAI'). On initial launch (or after longer breaks), the preparation of articles can take anywhere between 5-10 minutes.
 
 # Notes:
-The NYTimes is subscription based service with a quota of free articles. If you want to read beyont the free-quota using NewsAI, you must subscribe and log-in on your computer.
+The NYTimes is a subscription-based service with a quota of free articles. If you want to read beyond the free quota using NewsAI, you must subscribe and log in on your computer.
 
-OpenAI's API is a paid service. The app uses the `gpt-3.5-turbo-0125` model. For more info on pricing visit <a href="https://openai.com/pricing#language-models">OpenAI</a>.
+OpenAI's API is a paid service. The app uses the `gpt-3.5-turbo-0125` model. For more info on pricing, visit [OpenAI](https://openai.com/pricing#language-models).
 
 There are plans for numerous smaller improvements.
-User-experience:
-- ability to change API key
-- add a refresh button that updates articles in the backgorund and pushes them to the top (visually flagging new articles)
-- add a toolkit that'd allow users to customize how ChatGPT summarizes the articles or change model types (uses gpt3.5 currently)
-- implement a solution so that grouped articles with merged summaries have the option to show the individual summaries of all the components
-- add a Analytics window that shows various statistics about the articles
+
+User experience:
+- Ability to change the API key
+- Add a refresh button that updates articles in the background and pushes them to the top (visually flagging new articles)
+- Add a toolkit that allows users to customize how ChatGPT summarizes the articles or change model types (currently uses gpt-3.5)
+- Implement a solution so that grouped articles with merged summaries have the option to show the individual summaries of all the components
+- Add an Analytics window that shows various statistics about the articles
   
 Technical:
-- combine classes and implement them better (eg.: more efficient data management, combined web-operations, combined scraping and summary operations)
-- cleaner docstrings and comments
-- fucking fix the datastructure of articles
-- improve filtering on link and content scraping
+- Combine classes and implement them better (e.g., more efficient data management, combined web operations, combined scraping and summary operations)
+- Cleaner docstrings and comments
+- Fix the data structure of articles
+- Improve filtering on link and content scraping
 
-Bellow are a few major update ideas that I have. The chance that I'll develop them is small, for two reasons; copyright laws and the prohibitive cost of summarisation via OpenAI. As it stands, this is an open-source portfolio project that I work on in my free time. If there is substantial interest in the app from the open-source community and there are ways to overcome the above concerns, I'll be more likely to invest more time in it.
+Below are a few major update ideas that I have. The chance that I'll develop them is small, for two reasons: copyright laws and the prohibitive cost of summarization via OpenAI. As it stands, this is an open-source portfolio project that I work on in my free time. If there is substantial interest in the app from the open-source community and there are ways to overcome the above concerns, I'll be more likely to invest more time in it.
 
-A major planned update - if I get around to it - would be to introduce more static websites that can be scraped like FT, WSJ, BBC, Politico, Economist, IndiaTimes, GlobalTimes, TheTimes, Guardian, BuzzFeed, euronews, and more regional english language papers. Add these as option for users.
+A major planned update—if I get around to it—would be to introduce more static websites that can be scraped, like FT, WSJ, BBC, Politico, Economist, IndiaTimes, GlobalTimes, TheTimes, Guardian, BuzzFeed, Euronews, and more regional English language papers. Add these as options for users.
 
-Another major update idea is the introduction of topic detection and categorisation. This is an extension of the grouping concept, where articles are scraped without regards to what section they were scraped from. Instead, the categories are inferred from the text.
+Another major update idea is the introduction of topic detection and categorization. This is an extension of the grouping concept, where articles are scraped without regard to what section they were scraped from. Instead, the categories are inferred from the text.
 
-Lastly, I'd like to develop a separate framework to scrape articles. Inspired by the Python libary 'Newspapers', it would utilise ML to recognise HTMLs that contain article-like content and scrape the contents regardless of the unique HTML structure of the website. 'Newspapers' implements a heuristic approach where the general rules were discovered 'manually' and implemented as rules. The ML method has the added benefit of being able to scrape not just news-sites but think-tanks, magazines or even blogs.
+Lastly, I'd like to develop a separate framework to scrape articles. Inspired by the Python library 'Newspapers', it would utilize ML to recognize HTMLs that contain article-like content and scrape the contents regardless of the unique HTML structure of the website. 'Newspapers' implements a heuristic approach where the general rules were discovered 'manually' and implemented as rules. The ML method has the added benefit of being able to scrape not just news sites but think tanks, magazines, or even blogs.
 
 # Installation
-You'll need to download this repository to your computer and you'll need conda installed on your computer. Download the repo, if you already have conda installed, skip to Step 2.
-### Step 1 Install Conda
-To install conda visit either <a href="https://docs.anaconda.com/free/anaconda/install/index.html">miniconda</a> or <a href="https://github.com/conda-forge/miniforge">miniforge</a> and follow the instructions. I recommend mini-forge but use whichever.
+You'll need to download this repository to your computer, and you'll need Conda installed on your computer. Download the repo; if you already have Conda installed, skip to Step 2.
+### Step 1: Install Conda
+To install Conda, visit either [miniconda](https://docs.anaconda.com/free/anaconda/install/index.html) or [miniforge](https://github.com/conda-forge/miniforge) and follow the instructions. I recommend miniforge, but use whichever.
 
-### Step 2 Create your virtual environment
-Open your command line interface and navigate to the program folder then type 
+### Step 2: Create your virtual environment
+Open your command line interface and navigate to the program folder, then type:
 
 ```conda env create -f environment.yml```
 
-### Step 3 Activate your virtual envirnomen
+### Step 3: Activate your virtual environment
 Once the dependencies are installed, type:
 
 ```conda activate newsai```
@@ -48,6 +49,3 @@ Once the dependencies are installed, type:
 then (ensure you're in the program folder) type:
 
 ```python newsai.py```
-
-Give it a few minutes to do it's work. It takes longer on the first run as there are hundreds of articles to work through.
-
