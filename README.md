@@ -10,6 +10,7 @@ User-experience:
 - in-app refresh that updates articles in the backgorund and pushes them to the top (visually flagging new articles)
 - add add a toolkit that'd allow users to customize how ChatGPT summarizes the articles or change model types (uses gpt3.5 currently)
 - implement a solution so that grouped articles with merged summaries have the option to show the individual summaries of all the components
+- 
 Technical:
 - combine classes and implement them better (eg.: more efficient data management, combined web-operations, combined scraping and summary operations)
 - cleaner docstrings and comments
