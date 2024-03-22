@@ -47,7 +47,7 @@ class PostJSON:
         self.exceptions = []
 
 
-    async def post(self, requests):
+    async def post(self, submissions):
         """
         Main method that handles asynchronous HTTP 'POST' requests with OpenAI 
         by creating a list of tasks that can run concurrently. 
@@ -69,7 +69,7 @@ class PostJSON:
 
             # Creating a list of tasks
             tasks = [self._process_request(submissionfile, article, session) 
-                     for submissionfile, article in requests]
+                     for submissionfile, article in submissions]
 
             # Executing list of tasks concurrently
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -303,3 +303,135 @@ class Summary:
         """
         return round((article["summarycount"]/article["bodycount"]*100))
 
+
+class Merge:
+    """
+        Class responsible for merging the summaries of grouped articles.
+
+        Attributes:
+            manager (obj): data manager object
+            articles (list): list of current articles
+            groups (dict): dictionary of grouped articles, where each key is a 
+            group with a corresponding list of articles belonging to that group
+            {'group': [articles...]...}
+    """
+    def __init__(self):
+        self.manager = DataManager()
+        self.requests = PostJSON()
+        self.articles = self.manager.load()
+        self.groups = {}
+        self.submissions = []
+        self.responses = []
+
+
+    def merge(self):
+        """
+            Main method, that combines all the steps of the merger.
+        """
+        self.grouper()
+        self.check_groups()
+        self.compose_submissions()
+        self.responses = asyncio.run(self.requests.post(self.submissions))
+        self.process_responses()
+        self.manager.save(self.articles, "articles")
+
+
+    def process_responses(self):
+        """
+            Method to process the responses from OpenAI. Takes a list of 
+            2-tuples (response, group) and assigns a group summary to
+            each article belonging to a group.
+        """
+        for response, group in self.responses:
+            group_summary = response["choices"][0]["message"]["content"]
+            for article in self.articles:
+                if article["group"] == group:
+                    article["group_summary"] = group_summary
+
+
+    def compose_submissions(self):
+        """
+        Handles the composition of the submissionfile sent to OpenAI
+
+        Returns:
+            submissions (tuple): 2-tuple containing the submissionfile and 
+            article dict
+        """
+        # Initialising empty submissions container
+        submissions = []
+
+        # Iterating over articles 
+        for group in self.groups:
+
+            # Composing system prompt
+            n_summaries = len(self.groups[group])
+            system_prompt = (
+                f"You will be given {n_summaries} article summaries separated "
+                f"by `---`. "
+                f"Your task is to combine the summaries into a single cohesive "
+                f"summary."
+                f"Ensure that your answer is formatted in a single paragraph."
+            )
+
+            # Combining summaries with '---' separator
+            combined_summaries = "---".join(
+                [article["summary"] for article in self.groups[group]]
+                )
+
+            # Composing submissionfile
+            submissionfile = {
+                    "model": gpt_model,
+                    "messages": [{
+                        "role": "system",
+                        "content": system_prompt
+                    },{
+                        "role": "user",
+                        "content": combined_summaries
+                }],
+                "temperature": 0.5,
+                "max_tokens": 1000,
+                "top_p": 1.0,
+                "frequency_penalty": 0.0,
+                "presence_penalty": 0.0
+            }
+
+            # Adding completed submissionfile along with the group to the list 
+            # of submissions
+            submissions.append((submissionfile, group))
+
+        # Logging results
+        logger.info(f"Composed {len(submissions)} submissionfile for "
+            f"{len(self.groups)} groups")
+
+        self.submissions = submissions
+
+
+    def check_groups(self):
+        """
+            Methods that checks if groups were already merged.
+        """
+        # Iterating over groups
+        for group in list(self.groups.keys()):
+            articles = self.groups[group]
+            # Checking if group is summarised uniformly
+            try:
+                gsums = [article["group_summary"] for article in articles]
+                if all(gsum == gsums[0] for gsum in gsums):
+                    # Removing group
+                    logger.info(f"Removed group {group}, it's already merged")
+                    del self.groups[group]
+            # Detecting article without 'group_summary' key
+            except KeyError as error:
+                continue
+
+
+    def grouper(self):
+        """
+            Method is responsible for populating the 'groups' attribute. 
+        """
+        for article in self.articles:
+            group = article["group"]
+            if group != -1: # skip standalone articles
+                if group not in self.groups:
+                    self.groups[group] = []
+                self.groups[group].append(article)

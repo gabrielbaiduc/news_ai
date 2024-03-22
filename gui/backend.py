@@ -6,7 +6,9 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 from data_manager.manager import DataManager
 from scraping.scrape import FetchHTML, ScrapeLinks, ScrapeContents
-from summarising.summarise import Summary, PostJSON
+from summarising.summarise import Summary, PostJSON, Merge
+from grouping.preprocess import Preprocess
+from grouping.group import Group
 from utils.helpers import PrepareForGUI
 from config.settings import sections
 
@@ -38,132 +40,134 @@ class ArticleProcessor(QThread):
         # Starting scraping and updating status label
         self.status_update.emit("Downloading articles")
         new_articles = self.scrape()
+        if not new_articles:
+            self.status_update.emit("Processing articles")
+            prepared_articles = self.prepare_articles()
+            self.finished.emit(prepared_articles)
         
-        # Starting summarising and updating status label
-        self.status_update.emit("Summarising articles")
-        summarised_articles = self.summarise(new_articles)
+        else:
+            # Starting summarising and updating status label
+            self.status_update.emit("Summarising articles")
+            summarised_articles = self.summarise(new_articles)
 
-        # Starting processing and updating status label
-        self.status_update.emit("Processing articles")
-        prepared_articles = self.prepare_articles(summarised_articles)
+            # Preprocessing
+            self.status_update.emit("Preprocessing articles")
+            preprocessed_articles = self.preprocess(summarised_articles)
 
-        # Emiting finished signal with prepared articles
-        self.finished.emit(prepared_articles)
+            # Grouping text
+            self.status_update.emit("Grouping articles")
+            self.group()
+
+            # Starting processing and updating status label
+            self.status_update.emit("Processing articles")
+            prepared_articles = self.prepare_articles()
+
+            # Emiting finished signal with prepared articles
+            self.finished.emit(prepared_articles)
 
 
     def scrape(self):
         """ 
-        Abstracts the process of scraping away from `run`. Responsible for 
-        tying together the scraping process.
-        1) Fetch and parse the HTML contents of URLs specified in 'sections'
-        2) Scrape article links from the HTML contents of 1)
-        3) Fetch and parse the HTML concents of URSs scraped in 2)
-        4) Scrape article contents from the HTML contents of 3)
-
-        `FetchHTML` class implements an asynchronous algorithm that communicates
-        with the news-sites to retrieve their HTML contents and a
-        synchronous parsing algorithm, used for steps 1) and 3)
-        'ScrapeLinks' class scrapes link tags from parsed HTMLs, used for step
-        2)
-        'ScrarpeContents' class scrapes various article contents from parsed 
-        HTMLs, used for step 4)
-
+            Abstracts the process of scraping away from `run`. Responsible for 
+            tying together the scraping process. Returns a list of newly scraped
+            articles.
         """
-        # Initialising fetch&parser separately
+        # Initialising requests
         fetch = FetchHTML()
 
-        # Step 1)
-        logger.debug(f"\tFetching and parsing sections \n{150*"-"}")
+        # Fetching HTMLs from sections
         section_htmls = asyncio.run(fetch.fetch(sections))
         parsed_section_htmls = fetch.parse(section_htmls)
 
-        # Step 2)
-        logger.debug(f"\tScraping sections for article links \n{150*"-"}")
+        # Scraping links from section HTMLs
         scrapelinks = ScrapeLinks()
         new_article_links = scrapelinks.scrape(parsed_section_htmls)
         # Logging result of scraping (optional)
         scrapelinks.count_newlinks(new_article_links)
 
-        # Step 3)
-        logger.debug(f"\tFetching and parsing article links \n{150*"-"}")
-        scrapecontents = ScrapeContents()
+        # Fetching article HTMLs
         article_htmls = asyncio.run(fetch.fetch(new_article_links))
         parsed_article_htmls = fetch.parse(article_htmls)
 
-        # Step 4)
-        logger.debug(f"\tScraping article links for contents \n{150*"-"}")
+        # Scraping article contents
+        scrapecontents = ScrapeContents()
         new_articles = scrapecontents.scrape(parsed_article_htmls)
 
-        # Passing on the newly scraped articles for further processing.
         return new_articles
 
     def summarise(self, articles):
         """
-        Abstracts the process of summarising the articles away from 'run'.
-        Responsible for communicating with OpenAI and processing summaries.
-        The steps are:
-        1) Compose the JSON file that is submitted to OpenAI containing the 
-        instructions how to summarise and article data + the api_key 
-        2) Generate a `POST` request for each article summary and return 
-        the response
-        3) Process the response by storing the summary and meta data with the
-        article
-
-        'Summary' class composes the JSON datafile on one end, and processes
-        the response from OpenAI on the other end, used in steps 1) and 3)
-        'PostJSON' implements an asynchronous algorithm that communicates with
-        OpenAI and bundles the response with their respective articles, used for
-        step 2).
+            Abstracts the process of summarising the articles away from 'run'.
+            Returns summarised articles.
         """
-        # Step 1)
-        logger.debug(f"\tComposing datafiles for summaries \n{150*"-"}")
+        # Composing submission files
         summary = Summary(articles)
-        datafiles = summary.compose_submissionfile()
+        submissionfiles = summary.compose_submissionfile()
 
-        # Step 2)
-        logger.debug(f"\tRequesting summaries from OpenAI \n{150*"-"}")
+        # Requesting summaries
         post = PostJSON()
-        responses = asyncio.run(post.post(datafiles))
+        responses = asyncio.run(post.post(submissionfiles))
 
-        # Step 3)
-        logger.debug(f"\tExtracting summaries from response \n{150*"-"}")
+        # Processing responses
         summarised_articles = summary.process_response(responses)
+
         return summarised_articles
 
 
-    def prepare_articles(self, articles):
+    def preprocess(self, summarised_articles):
+        """ 
+            Abstracts the preprocessing away from 'run'.
         """
-        Abstracts the process of preparing the articles for the GUI.
+        # Preprocessing article's text contents
+        preprocessor = Preprocess()
+        preprocessed_articles = preprocessor.process(summarised_articles)
 
-        Params:
-            articles (list): the newly scraped articles as a list of dicts
-        """
-        # Mergind existing and new article data.
-        logger.debug(f"\tMerging new articles with old articles \n{150*"-"}")
-        # Loading existing data
+        # Merging old articles with new ones and saving merged
         manager = DataManager()
         old_articles = manager.load()
-        # Validating existing data
         if old_articles and not isinstance(old_articles, json.JSONDecodeError):
             logger.info(f"Combined {len(old_articles)} existing articles with "
-                f"{len(articles)} new articles."
+                f"{len(preprocessed_articles)} new articles."
                 )
-            # Merging existing data with new data
-            articles.extend(old_articles)
-            # Saving merged data
-            manager.save(articles, "articles")
-        # If no existing data or data is corrupted, save new articles only
-        else:
-            manager.save(articles, "articles")
+            preprocessed_articles.extend(old_articles)
+            manager.save(preprocessed_articles, "articles")
 
-        # Preparing data for GUI
-        logger.debug(f"\tPreparing articles for the GUI \n{150*"-"}")
+        # logging corrupted file
+        elif isinstance(old_articles, json.JSONDecodeError):
+            logger.error(f"'articles.json' is corrupt. Could not save")
+
+        # Saving new articles only, likely on first run
+        else:
+            logger.warning(f"No data found when trying to merge new with old")
+            manager.save(preprocessed_articles, "articles")
+
+
+    def group(self):
+        """
+            Abstracts the process of grouping away from 'run'. Handles the 
+            clustering of articles and the subsequent merging of summaries
+            via OpenAI.
+        """
+        # Grouping articles
+        grouper = Group()
+        grouper.group()
+
+        # Merging summaries of groups
+        merger = Merge()
+        merger.merge()
+
+
+
+    def prepare_articles(self):
+        """
+        Abstracts the process of preparing the articles for the GUI.
+        """
         # Updating data
+        manager = DataManager()
         manager.update_current()
-        # Loading updated data
-        articles = manager.load()
+
         # Sorting and categorising
-        prepare = PrepareForGUI(articles)
+        prepare = PrepareForGUI()
         prepared_articles = prepare.prepare()
 
         return prepared_articles

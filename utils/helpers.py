@@ -5,6 +5,9 @@ from collections import defaultdict
 
 from dateutil import tz
 
+from data_manager.manager import DataManager
+from summarising.summarise import Merge
+
 # Holds auxileary classe and functions that work with data or perform checks 
 # on data. For the most part, these are here because I didn't know where else to
 # put them
@@ -35,14 +38,17 @@ class PrepareForGUI:
     """ 
     Utility class that organises articles so it's easier for the GUI to display
     """
-    def __init__(self, articles):
+    def __init__(self):
         """ 
         Initialise articles to prepare. 
         
         Attr:
             articles (list): a list of articles where each article is a dict
         """
-        self.articles = articles
+        self.manager = DataManager()
+        self.articles = self.manager.load()
+        self.groups = {}
+        self.grouped_articles = []
 
 
     def prepare(self):
@@ -53,6 +59,12 @@ class PrepareForGUI:
             prepared (dict): dictionary with categories as keys and a list of
                                 articles belonging to that category as values
         """
+        # Grouping
+        self.grouper()
+
+        # merging groups
+        self.merge_groups()
+
         # Sorting
         sortd = self._sort()
 
@@ -75,7 +87,7 @@ class PrepareForGUI:
         """
         # Sorting by date published
         sortebypubdate = sorted(
-            self.articles, 
+            self.grouped_articles, 
             key=lambda x: x["published"], 
             reverse=True)
 
@@ -102,6 +114,44 @@ class PrepareForGUI:
         return categorised
 
 
+    def merge_groups(self):
+        """
+            Method that merges the URLs, headlines, publishing dates, sources
+            and categories of grouped articles. 
+        """
+        for group in self.groups:
+            grouped_article = {}
+            articles = self.groups[group]
+            grouped_article["grouped"] = True
+            grouped_article["url"] = [a["url"] for a in articles]
+            grouped_article["headline"] = [a["headline"] for a in articles]
+            grouped_article["summary"] = articles[0]["group_summary"]
+            grouped_article["source"] = [a["source"] for a in articles]
+            grouped_article["category"] = []
+            for article in articles:
+                for category in article["category"]:
+                    if category not in grouped_article["category"]:
+                        grouped_article["category"].append(category)
+            timestamps = [dt["published"].timestamp() for dt in articles]
+            avg_timestamp = sum(timestamps) / len(timestamps)
+            offset_naive = datetime.fromtimestamp(avg_timestamp)
+            offset_aware = offset_naive.astimezone(tz.tzutc())
+            grouped_article["published"] = offset_aware
+            self.grouped_articles.append(grouped_article)
+
+    def grouper(self):
+        """
+            Method is responsible for populating the 'groups' attribute. 
+        """
+        for article in self.articles:
+            group = article["group"]
+            if group != -1: # skip standalone articles
+                if group not in self.groups:
+                    self.groups[group] = []
+                self.groups[group].append(article)
+            elif group == -1:
+                article["grouped"] = False
+                self.grouped_articles.append(article)
 
 
 

@@ -3,15 +3,13 @@ from pathlib import Path
 from datetime import datetime
 import logging
 
-from utils.helpers import isoutdated
-
 # DataManager module responsible for operations on locally stored data
 # ToDo:
 # 1) streamline 'DataManager', review how and where it's used, reduce the number
 #   of unnecessary load and save operations (like in 'update_current'). 
 #   main use is in 'gui/backend.py' so rewrite the thread class to handle data
 #   management better.
-
+# 2) fix circular import with 'utils/helpers.py' using 'isoutdated'
 logger = logging.getLogger(__name__)
 
 
@@ -114,6 +112,7 @@ class DataManager:
 
         """
         # Loading data
+        from utils.helpers import isoutdated
         articles = self.load("articles")
         discarded = self.load("discarded")
         archived = self.load("archived")

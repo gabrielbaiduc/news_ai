@@ -134,17 +134,10 @@ user_agents = [
 kr_system = "News-AI"
 kr_username = "openai_api_key"
 
+# Parameter grid for the custom parameter search in 'grouping/group.py'
+parameter_grid = {
+    'eps': [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    "n_components": [70, 90, 110, 130, 150]
+}
 
-# Description displayed on the landing screen of the app
-app_description = (
-    f"An app for those with a busy schedule and a misplaced sense of \n"
-    f"civic responsibility.\nWith News-AI you can claw your way "
-    f"through your daily gobblet of good vibes with unparalled "
-    f"efficiency.\nNo jokes, but this little app cuts your "
-    f"laugther lixir quota by at least 80%,\ngivin you much needed "
-    f"time to have lunch or do some work. \n"
-    f"Or whatever...\n"
-    f"Just press start and get your silly syrup segment.\n"
-    f"Powered by the robots over at OpenAI.\n"
-    f"Oh, and, this shit is not free. Nothing in life is."
-    )
+# System prompt for merging.

@@ -12,7 +12,7 @@ from PyQt5.QtCore import Qt, QEvent, QSize
 
 from gui.widgets import CustomLabel
 from gui.backend import ArticleProcessor
-from config.settings import kr_system, kr_username, app_description
+from config.settings import kr_system, kr_username
 
 # This module wraps most of the application logic. 
 # The MainWindow handles the GUI elements and handles the backcend logic on
@@ -50,128 +50,121 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("News-AI")
         self.setGeometry(100, 100, 800, 1000)
 
+        # Installing scrolling event filter to hide tooltips on scroll
+        QApplication.instance().installEventFilter(self)
+        self.activeTooltip = None
+
         # API key check ahead of UI init
         self.check_for_api()
+        # keyring.delete_password(kr_system, kr_username)
 
 
     def check_for_api(self):
-        """ Checks for auth key then initialises UI """ 
+        """ Checks for auth key then initializes UI """ 
         self.api_key = keyring.get_password(kr_system, kr_username)
-
-        # Different inits depending on result
-        if self.api_key:
-            self.init_landing_api()
-        else:
-            self.init_landing_noapi()
+        self.init_landing()
 
 
-    def init_landing_noapi(self):
-        """ 
-        Initialising UI when no auth key detected, usually on initial launch.
-        """
-        # Setting container widget
+    def init_landing(self):
+        """ Unified landing page initialization. """
+        # Set container widget and layout
         main_widget = QWidget(self)
         self.setCentralWidget(main_widget)
-
-        # Setting vertical layout
         main_v_layout = QVBoxLayout(main_widget)
-        main_v_layout.setAlignment(Qt.AlignCenter)  # Horizontal alignment
-        main_v_layout.setContentsMargins(50, 0, 50, 0) # Horizontal margins
+        self.configure_layout(main_v_layout)
 
-        # Centering widgets vertically
-        top_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        # Add UI components
+        self.add_welcome_label(main_v_layout, api_key_exists=bool(self.api_key))
+        if not self.api_key:
+            self.add_api_input(main_v_layout)
+        self.add_start_button(main_v_layout)
 
-        # Adding top spacer, contents go between here and bottom spacer
-        main_v_layout.addSpacerItem(top_spacer)
 
-        # Adding welcome and introduction
-        welcome_label = QLabel("Welcome to News-AI\nCreated by Gabai")
-        welcome_label.setAlignment(Qt.AlignCenter)
-        welcome_label.setFont(self.set_font(20))
-        main_v_layout.addWidget(welcome_label)
+    def configure_layout(self, layout):
+        """Configure layout alignment and margins."""
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(50, 0, 50, 0)
+        layout.setSpacing(20)
 
-        # Adding input field
+
+    def add_welcome_label(self, layout, api_key_exists):
+        """Add a welcome label to the layout."""
+        text = ("Welcome to News-AI" if not api_key_exists 
+            else "Welcome back to News-AI")
+        label = QLabel(text)
+        label.setAlignment(Qt.AlignCenter)
+        label.setFont(self.set_font(20))
+        label.setStyleSheet("color: #979797;")
+        layout.addWidget(label)
+
+
+    def add_api_input(self, layout):
+        """Add API key input field to the layout."""
         self.api_input = QLineEdit()
         self.api_input.setEchoMode(QLineEdit.Password)
         self.api_input.setPlaceholderText("Enter your OpenAI API key here...")
-        main_v_layout.addWidget(self.api_input)
+        self.api_input.setFont(self.set_font(14))
+        self.api_input.setFixedSize(400, 35)  # Set fixed size for input field
+        self.api_input.setStyleSheet("padding: 5px; border-radius: 10px;")
 
-        # Adding Start button
+        # Center the input field with a horizontal layout
+        api_input_h_layout = QHBoxLayout()
+        api_input_h_layout.addWidget(self.api_input)
+        api_input_h_layout.setAlignment(Qt.AlignCenter)
+        layout.addLayout(api_input_h_layout)
+
+        # Add a label for displaying errors under the API input
+        self.error_label = QLabel()
+        self.error_label.setStyleSheet("color: red;")
+        self.error_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.error_label) 
+
+
+    def add_start_button(self, layout):
+        """Add a start button to the layout with a fixed size."""
         button = QPushButton("Start")
-        button.setFont(self.set_font(14))
-        button.clicked.connect(self.start_noapi)
-        main_v_layout.addWidget(button)
+        button.setFont(self.set_font(16))
+        button.setStyleSheet("""
+            QPushButton {
+             color: #979797; 
+             border: 1px solid gray; 
+             border-radius: 15px; 
+             padding: 5px; }
 
-        # Adding bottom spacer
-        main_v_layout.addSpacerItem(bottom_spacer)
-
-
-    def init_landing_api(self):
-        """ Initialising UI when auth key exists. """
-        # Setting container widget
-        main_widget = QWidget(self)
-        self.setCentralWidget(main_widget)
-
-        # Setting vertical layout
-        main_v_layout = QVBoxLayout(main_widget)
-        main_v_layout.setAlignment(Qt.AlignCenter)  # Horizontal alignment
-        main_v_layout.setContentsMargins(50, 0, 50, 0) # Horizontal margins
-
-
-        # Centering widgets vertically
-        top_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        # Adding top spacer, contents go between here and bottom spacer
-        main_v_layout.addSpacerItem(top_spacer)
-
-        # Adding welcome 
-        welcome_label = QLabel("Welcome to News-AI")
-        welcome_label.setStyleSheet("color: #979797;")
-        welcome_label.setFont(self.set_font(20))
-        welcome_label.setAlignment(Qt.AlignCenter)
-        main_v_layout.addWidget(welcome_label)
-
-        # Adding Start button
-        button = QPushButton("Start")
-        button.setFont(self.set_font(14))
-        button.setStyleSheet("color: #979797;")
-        button.clicked.connect(self.start_api)
+            QPushButton:hover {
+             background-color: gray; 
+            }
+             """)
         button_h_layout = QHBoxLayout()
-        button_h_layout.setAlignment(Qt.AlignCenter)
+        
+        # This will center the button within the horizontal layout
+        button_h_layout.addStretch()
         button_h_layout.addWidget(button)
-        main_v_layout.addLayout(button_h_layout)
+        button_h_layout.addStretch()
+        
+        # Set the fixed size of the button (width, height)
+        button.setFixedSize(175, 40)  
+        
+        button.clicked.connect(self.start_application)
+        layout.addLayout(button_h_layout)
 
-        # Adding bottom spacer
-        main_v_layout.addSpacerItem(bottom_spacer)
 
-
-    def start_noapi(self):
-        # Retrieving text from input field
-        self.api_key = self.api_input.text()
-
-        # Checking for text
+    def start_application(self):
+        """Unified method to handle Start button click."""
+        # If API key is not set, try to get it from the input field
         if not self.api_key:
-            print("You must enter an OpenAI API Key.")
-
-        # Pinging OpenAI to validate auth key
-        elif not self.check_api_key(self.api_key):
-            print("API Key invalid! Enter a valid OpenAI API Key.")
-
-        # Saving auth key and starting program given response is '200'
-        else:
-            keyring.set_password(system, username, self.api_key)
-            self.init_loading_screen()
-            self.start_background_task()
-
-
-    def start_api(self):
-        # Pingin OpenAI to validate auth key
-        if not self.check_api_key(self.api_key):
-            print("API Key invalid! Sorry for the inconvenience")
-
-        # Starting program given response is '200'
+            entered_api_key = self.api_input.text().strip()
+            if entered_api_key:
+                if self.check_api_key(entered_api_key):
+                    self.api_key = entered_api_key
+                    keyring.set_password(kr_system, kr_username, self.api_key)
+                    self.init_loading_screen()
+                    self.start_background_task()
+                else:
+                    self.error_label.setText(
+                        f"API Key invalid! Enter a valid OpenAI API Key.")
+            else:
+                self.error_label.setText("You must enter an OpenAI API Key.")
         else:
             self.init_loading_screen()
             self.start_background_task()
@@ -263,67 +256,39 @@ class MainWindow(QMainWindow):
         """
         Handles the main article display screen.
         """
-        # Clearing central widget from previous screen
-        self.takeCentralWidget() 
-
-        # Creating 
-        self.tabs = QTabWidget() # Create tabs
+        self.takeCentralWidget()
+        self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
         self.setStyleSheet("""
-                QTabWidget::pane { 
+                QTabWidget::pane {
                     border: none;
                 }
                 QTabBar::tab {
                     border: none;
                     padding: 20px;
                 }
-                QTabBar::tab:selected {
-                    color: gray;
-                }
-                QTabBar::tab:hover {
+                QTabBar::tab:selected, QTabBar::tab:hover {
                     color: gray;
                 }
             """)
-        font_for_tabs = QFont()
-        font_for_tabs.setFamily("Avenir Next")
-        font_for_tabs.setPointSize(12)
-        font_for_tabs.setWeight(20)
-        font_for_tabs.setLetterSpacing(QFont.PercentageSpacing, 110)
-        self.tabs.tabBar().setFont(font_for_tabs)
+        self.tabs.tabBar().setFont(self.set_font(12, 20, 110))
 
         for category in articles:
-            # Create tab widget
             tab = QWidget()
-            tab_layout = QVBoxLayout()
-            tab_layout.setAlignment(Qt.AlignCenter)
+            tab_layout = QVBoxLayout(tab)
             tab_layout.setContentsMargins(85, 35, 85, 35)
             tab_layout.setSpacing(20)
 
-            content_widget = QWidget()
-            content_widget.setLayout(tab_layout)
-
             scroll_area = QScrollArea()
             scroll_area.setWidgetResizable(True)
-            scroll_area.setWidget(content_widget)
-
-            layout = QVBoxLayout(tab)
-            layout.addWidget(scroll_area)
+            scroll_area.setWidget(tab)
             self.tabs.addTab(scroll_area, f"{category}")
 
-
             for article in articles[category]:
-                summary = article["summary"]
-                label = CustomLabel(summary, article, self)
-                # two lines that prevent horizontal and vertical overflow
-                label.setWordWrap(True) 
-                label.setSizePolicy(QSizePolicy.Expanding, 
-                                        QSizePolicy.Expanding) 
-                font = QFont()
-                font.setFamily("Avenir Next")
-                font.setPointSize(14)
-                font.setLetterSpacing(QFont.PercentageSpacing, 105)
-                # font.setWeight(15)
-                label.setFont(font)
+                label = CustomLabel(article["summary"], article, self)
+                label.setWordWrap(True)
+                label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                label.setFont(self.set_font(14))
                 tab_layout.addWidget(label)
 
 
@@ -355,3 +320,14 @@ class MainWindow(QMainWindow):
 
         # Returning font object
         return font
+
+
+    def eventFilter(self, source, event):
+        """
+            Method that listents for scroll events globally and hides active
+            tooltip on event.
+        """
+        if event.type() == QEvent.Wheel and self.activeTooltip:
+            self.activeTooltip.hide()
+            self.activeTooltip = None
+        return super().eventFilter(source, event)
