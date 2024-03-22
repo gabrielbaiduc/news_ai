@@ -8,19 +8,17 @@ The NYTimes is a subscription-based service with a quota of free articles. If yo
 
 OpenAI's API is a paid service. The app uses the `gpt-3.5-turbo-0125` model. For more info on pricing, visit [OpenAI](https://openai.com/pricing#language-models).
 
-There are plans for numerous smaller improvements.
-
-User experience:
+Planned user experience updates:
 - Ability to change the API key
 - Add a refresh button that updates articles in the background and pushes them to the top (visually flagging new articles)
 - Add a toolkit that allows users to customize how ChatGPT summarizes the articles or change model types (currently uses gpt-3.5)
 - Implement a solution so that grouped articles with merged summaries have the option to show the individual summaries of all the components
 - Add an Analytics window that shows various statistics about the articles
   
-Technical:
-- Combine classes and implement them better (e.g., more efficient data management, combined web operations, combined scraping and summary operations)
+Planned technical updates:
+- Improve class implementation them better (e.g., combined web operations, combined scraping and summary operations)
+- Improve data structure and handling
 - Cleaner docstrings and comments
-- Fix the data structure of articles
 - Improve filtering on link and content scraping
 
 Below are a few major update ideas that I have. The chance that I'll develop them is small, for two reasons: copyright laws and the prohibitive cost of summarization via OpenAI. As it stands, this is an open-source portfolio project that I work on in my free time. If there is substantial interest in the app from the open-source community and there are ways to overcome the above concerns, I'll be more likely to invest more time in it.
