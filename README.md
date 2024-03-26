@@ -5,6 +5,7 @@ NewsAI is an end-to-end desktop application that seeks to streamline news consum
 ## First Launch
 
 Upon the first launch, users are welcomed with a message and are prompted to input their OpenAI API key. Please have your key ready. The key is securely stored using your operating system's password manager. For adjustments, search for 'NewsAI' within your password manager. Initial setup, or re-initialization after a significant break, may take between 5-10 minutes as the application prepares the articles.
+![Loading Screen](https://i.imgur.com/2X4AJVZ.png)
 
 ## Notes
 
