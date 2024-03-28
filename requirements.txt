@@ -1,9 +1,0 @@
-aiohttp
-beautifulsoup4
-keyring
-nltk
-PyQt5
-PyQt5_sip
-python_dateutil
-Requests
-scikit_learn
