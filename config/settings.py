@@ -29,7 +29,7 @@
 # analytics and display.
 
 # ToDo:
-# 1) Add Guardian, SkyNews, CNN and potentially other sources.
+# 1) Add more sources
 
 # List of urls grouped by source and custom category. 
 sections =[
