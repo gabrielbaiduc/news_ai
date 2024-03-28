@@ -142,3 +142,7 @@ data/*.json
 
 # Log files
 .log
+
+# Sublime project files
+*.sublime-workspace
+*.sublime-project
